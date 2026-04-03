@@ -1,0 +1,16 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /bookings/{bookingId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['title', 'name', 'date', 'startTime', 'endTime'])
+        && request.resource.data.title is string
+        && request.resource.data.name is string
+        && request.resource.data.date is string
+        && request.resource.data.startTime is string
+        && request.resource.data.endTime is string;
+      allow delete: if true;
+      allow update: if false;
+    }
+  }
+}
