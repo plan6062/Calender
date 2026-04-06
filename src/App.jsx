@@ -37,7 +37,7 @@ function getDayLabel(date) {
 }
 
 export default function App() {
-  const [tab, setTab] = useState('month')
+  const [tab, setTab] = useState('week')
   const [currentDate, setCurrentDate] = useState(new Date())
   const [bookings, setBookings] = useState([])
   const [modal, setModal] = useState(null) // null | { type: 'new', date } | { type: 'view', booking }
@@ -87,7 +87,10 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* Calendar Section (70%) */}
+      {/* Today Schedule Section (위) */}
+      <TodaySchedule bookings={bookings} onBookingClick={handleBookingClick} />
+
+      {/* Calendar Section (아래) */}
       <div className="calendar-section">
         {/* Header */}
         <header className="cal-header">
@@ -125,9 +128,6 @@ export default function App() {
           )}
         </div>
       </div>
-
-      {/* Today Schedule Section (30%) */}
-      <TodaySchedule bookings={bookings} onBookingClick={handleBookingClick} />
 
       {/* FAB */}
       <button className="fab" onClick={handleFabClick} aria-label="새 예약">+</button>

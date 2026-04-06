@@ -71,13 +71,13 @@ export default function CalendarMonthly({ currentDate, bookings, onDateClick }) 
                     {date.getDate()}
                   </span>
                   <div className="day-bookings">
-                    {dayBookings.slice(0, 2).map((b) => (
+                    {dayBookings.slice(0, 3).map((b) => (
                       <div key={b.id} className="booking-chip" title={b.title}>
-                        {b.startTime} {b.title}
+                        {b.title}
                       </div>
                     ))}
-                    {dayBookings.length > 2 && (
-                      <div className="booking-more">+{dayBookings.length - 2}</div>
+                    {dayBookings.length > 3 && (
+                      <div className="booking-more">+{dayBookings.length - 3}</div>
                     )}
                   </div>
                 </div>

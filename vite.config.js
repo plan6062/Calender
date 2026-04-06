@@ -12,7 +12,7 @@ export default defineConfig({
         name: '회의실 예약 캘린더',
         short_name: '회의실예약',
         description: '회의실 예약 관리 캘린더',
-        theme_color: '#0d9488',
+        theme_color: '#1d2474',
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
