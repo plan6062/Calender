@@ -1,10 +1,8 @@
 import { useMemo, useEffect, useState } from 'react'
+import { dateToStr, timeToMin, START_HOUR, END_HOUR, SLOT_H } from '../utils'
 
 const WEEKDAYS = ['월', '화', '수', '목', '금']
-const START_HOUR = 8
-const END_HOUR = 20
 const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => i + START_HOUR)
-const SLOT_H = 64    // px per hour
 const HEADER_H = 78  // px, must match .wk-header height in CSS
 
 function getMonday(date) {
@@ -14,15 +12,6 @@ function getMonday(date) {
   d.setDate(d.getDate() + diff)
   d.setHours(0, 0, 0, 0)
   return d
-}
-
-function dateToStr(date) {
-  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
-}
-
-function timeToMin(t) {
-  const [h, m] = t.split(':').map(Number)
-  return h * 60 + m
 }
 
 function getNowMin() {
@@ -59,7 +48,6 @@ export default function CalendarWeekly({ currentDate, bookings, onDateClick, onB
 
   return (
     <div className="calendar-weekly">
-      {/* Single scroll container — header + grid share the same width */}
       <div className="wk-scroll">
         <div className="wk-inner" style={{ height: HEADER_H + totalH + 'px' }}>
 
@@ -93,28 +81,36 @@ export default function CalendarWeekly({ currentDate, bookings, onDateClick, onB
             ))}
           </div>
 
-          {/* Events overlay — top starts after the header */}
+          {/* Events overlay */}
           <div className="wk-events-layer" style={{ top: HEADER_H + 'px' }}>
             {weekDates.map((date, di) =>
               getBookingsForDate(date).map((b) => {
                 const startMin = timeToMin(b.startTime) - START_HOUR * 60
                 const endMin   = timeToMin(b.endTime)   - START_HOUR * 60
+                const durationMin = endMin - startMin
                 const top    = (startMin / 60) * SLOT_H
-                const height = Math.max(((endMin - startMin) / 60) * SLOT_H, 24)
+                const height = Math.max((durationMin / 60) * SLOT_H, 24)
+                const titleFontSize =
+                  durationMin <= 10 ? '10px' :
+                  durationMin <= 20 ? '12px' :
+                  durationMin <= 30 ? '14px' : '17px'
+                const eventPadding =
+                  height <= 24 ? '1px 5px' :
+                  height <= 32 ? '2px 6px' : undefined
                 return (
                   <div
                     key={b.id}
                     className="wk-event"
                     style={{
-                      top:    top + 'px',
-                      height: height + 'px',
-                      left:   `calc(${di} * 100% / 5 + 3px)`,
-                      width:  `calc(100% / 5 - 6px)`,
+                      top:     top + 'px',
+                      height:  height + 'px',
+                      left:    `calc(${di} * 100% / 5 + 3px)`,
+                      width:   `calc(100% / 5 - 6px)`,
+                      ...(eventPadding && { padding: eventPadding }),
                     }}
                     onClick={() => onBookingClick(b)}
                   >
-                    <span className="wk-event-title">{b.title}</span>
-                    <span className="wk-event-time">{b.startTime}~{b.endTime}</span>
+                    <span className="wk-event-title" style={{ fontSize: titleFontSize }}>{b.title}</span>
                   </div>
                 )
               })

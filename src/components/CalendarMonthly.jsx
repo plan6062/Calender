@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { dateToStr } from '../utils'
 
 const WEEKDAYS = ['월', '화', '수', '목', '금']
 
@@ -10,7 +11,6 @@ function isSameDate(a, b) {
 
 export default function CalendarMonthly({ currentDate, bookings, onDateClick }) {
   const today = new Date()
-
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
 
@@ -18,9 +18,8 @@ export default function CalendarMonthly({ currentDate, bookings, onDateClick }) 
     const firstDay = new Date(year, month, 1)
     const lastDay = new Date(year, month + 1, 0)
 
-    // Start from Monday of the first week
     const startDate = new Date(firstDay)
-    const dayOfWeek = startDate.getDay() // 0=Sun, 1=Mon...
+    const dayOfWeek = startDate.getDay()
     const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek
     startDate.setDate(startDate.getDate() + diff)
 
@@ -33,19 +32,16 @@ export default function CalendarMonthly({ currentDate, bookings, onDateClick }) 
         week.push(new Date(current))
         current.setDate(current.getDate() + 1)
       }
-      // startDate is Monday, so week[0]=Mon, week[1]=Tue, ..., week[4]=Fri
-      const mf = [week[0], week[1], week[2], week[3], week[4]]
-      rows.push(mf)
+      // week[0]=Mon ... week[4]=Fri
+      rows.push([week[0], week[1], week[2], week[3], week[4]])
       if (current > lastDay && current.getDay() === 1) break
       if (current > lastDay && rows.length >= 6) break
     }
     return rows
   }, [year, month])
 
-  const getBookingsForDate = (date) => {
-    const dateStr = `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
-    return bookings.filter((b) => b.date === dateStr)
-  }
+  const getBookingsForDate = (date) =>
+    bookings.filter((b) => b.date === dateToStr(date))
 
   return (
     <div className="calendar-monthly">

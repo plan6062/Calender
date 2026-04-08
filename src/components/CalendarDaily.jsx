@@ -1,16 +1,6 @@
-const START_HOUR = 8
-const END_HOUR = 20
+import { dateToStr, timeToMin, START_HOUR, END_HOUR, SLOT_H } from '../utils'
+
 const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => i + START_HOUR)
-const SLOT_H = 64 // px per hour
-
-function timeToMin(t) {
-  const [h, m] = t.split(':').map(Number)
-  return h * 60 + m
-}
-
-function dateToStr(date) {
-  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`
-}
 
 export default function CalendarDaily({ currentDate, bookings, onBookingClick }) {
   const dateStr = dateToStr(currentDate)
@@ -39,18 +29,32 @@ export default function CalendarDaily({ currentDate, bookings, onBookingClick })
           {dayBookings.map((b) => {
             const startMin = timeToMin(b.startTime) - START_HOUR * 60
             const endMin   = timeToMin(b.endTime)   - START_HOUR * 60
+            const durationMin = endMin - startMin
             const top    = (startMin / 60) * SLOT_H
-            const height = Math.max(((endMin - startMin) / 60) * SLOT_H, 24)
+            const height = Math.max((durationMin / 60) * SLOT_H, 24)
+            const titleFontSize =
+              durationMin <= 10 ? '11px' :
+              durationMin <= 20 ? '14px' :
+              durationMin <= 30 ? '17px' : '22px'
+            const eventPadding =
+              height <= 24 ? '2px 8px' :
+              height <= 36 ? '4px 10px' : undefined
+            const isCompact = durationMin <= 30
             return (
               <div
                 key={b.id}
                 className="dl-event"
-                style={{ top: top + 'px', height: height + 'px' }}
+                style={{
+                  top: top + 'px',
+                  height: height + 'px',
+                  ...(eventPadding && { padding: eventPadding }),
+                  ...(isCompact && { flexDirection: 'row', alignItems: 'center', gap: '6px' }),
+                }}
                 onClick={() => onBookingClick(b)}
               >
                 <span className="dl-event-time">{b.startTime} – {b.endTime}</span>
-                <span className="dl-event-title">{b.title}</span>
-                <span className="dl-event-name">{b.name}</span>
+                <span className="dl-event-title" style={{ fontSize: titleFontSize, flex: isCompact ? 1 : undefined }}>{b.title}</span>
+                <span className="dl-event-name" style={isCompact ? { fontSize: '11px', flexShrink: 0 } : {}}>{b.name}</span>
               </div>
             )
           })}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { collection, onSnapshot } from 'firebase/firestore'
 import { db } from './firebase'
+import { dateToStr } from './utils'
 import TabBar from './components/TabBar'
 import CalendarMonthly from './components/CalendarMonthly'
 import CalendarWeekly from './components/CalendarWeekly'
@@ -9,12 +10,6 @@ import TodaySchedule from './components/TodaySchedule'
 import BookingModal from './components/BookingModal'
 import './App.css'
 
-function dateToStr(date) {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
-}
 
 function getMonthLabel(date) {
   return `${date.getFullYear()}년 ${date.getMonth() + 1}월`
@@ -85,6 +80,17 @@ export default function App() {
 
   const closeModal = () => setModal(null)
 
+  const handleFullscreen = () => {
+    const elem = document.documentElement
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen()
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen()
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen()
+    }
+  }
+
   return (
     <div className="app">
       {/* Today Schedule Section (위) */}
@@ -100,6 +106,7 @@ export default function App() {
             <button className="today-btn" onClick={goToday}>오늘</button>
           </div>
           <button className="nav-btn" onClick={() => navigate(1)}>›</button>
+          <button className="fullscreen-btn" onClick={handleFullscreen} title="전체화면">⛶</button>
         </header>
 
         {/* Calendar View */}
